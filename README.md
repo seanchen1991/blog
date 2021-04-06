@@ -6,6 +6,13 @@ Blog posts, mostly about Rust.
 
 | Date | Title | 
 |-|-|
+| 2021-01-23 | [Implementing an LRU Cache in Rust](./posts/lru-cache/index.md) |
+| 2020-11-27 | [Semaphores in Rust](./posts/semaphores/index.md) |
+| 2020-08-18 | [Why I'm Switching from VSCode to OniVim 2](./posts/onivim2/index.md) |
+| 2020-07-20 | [Haskell::From(Rust) I: Infix Notation and Currying](./posts/haskell-from-rust-I/index.md) |
+| 2020-07-13 | [Some Learnings from Implementing a Normalizing Rust Representer](./posts/rust-representer/index.md) |
+| 2020-06-03 | [The Story of Tail Call Optimizations in Rust](./posts/tco-story/index.md) |
+| 2020-05-27 | [Takeaways from My Initial Exposure to Rust](./posts/takeaways-I/index.md) |
 
 ## Notifications
 
