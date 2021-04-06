@@ -23,6 +23,10 @@ Get notified when a new post gets published by watching this repo's releases (cl
 
 If you have any feedback, please open an [issue][issue] on this repo. PRs for even minor fixes like typos and grammar are appreciated!
 
+## Discuss
+
+Feel free to start a discussion on any of the content published in this blog over in the [discussions forum](https://github.com/seanchen1991/blog/discussions)!
+
 ## Licensing
 
 To be compatible with [Rust](https://github.com/rust-lang/rust), all code examples in this blog are licensed under [Apache License Version 2.0](./license-apache) or [MIT License](./license-mit), at your option.
