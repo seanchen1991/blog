@@ -28,7 +28,7 @@ With a loose specification of the requirements of our LRU cache, we can define t
 from doubly_linked_list import DoublyLinkedList
 
 class LRUCache:
-    def __init__(self, capacity=100):
+	def __init__(self, capacity=100):
 		# the max number of entries the cache can hold
 		self.capacity = capacity
 		# the hash map for storing entries as key-value pairs 

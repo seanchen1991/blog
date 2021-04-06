@@ -1,4 +1,4 @@
-# Implementing Synchronization Primitives in Rust: Semaphores
+# Semaphores in Rust
 _November 27th, 2020 | #rust | #synchronization_primitives | #the_little_book_of_semaphores | #intermediate_
 
 > Note: I recently stumbled upon Allen Downey’s [_The Little Book of Semaphores_](https://greenteapress.com/wp/semaphores), which is a short, sweet, and to-the-point textbook on the topic of synchronization. 
