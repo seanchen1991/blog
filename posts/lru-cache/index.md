@@ -35,8 +35,8 @@ class LRUCache:
 		# it’s what allows us to efficiently fetch entries 
 		self.storage = dict()
 		# a doubly linked list for keeping track of the order
-   		# of elements in our cache 
-   		self.order = DoublyLinkedList()
+		# of elements in our cache 
+		self.order = DoublyLinkedList()
 ```
 
 > Note: We won’t be going over the design and implementation of the `DoublyLinkedList` that we’re using here, though its code is included in the GitHub repo should you wish to take a look. 
@@ -58,12 +58,12 @@ Additionally, if it turns out the cache is already at max capacity, we’ll need
 			# the linked list
 			self.touch(entry)
 			return
-			
+
 		# check if our cache is at max capacity to see
 		# if we need to evict the oldest entry 
 		if len(self.storage) == self.capacity:
 			self.evict()
-			
+
 		# add the key and value as a node at the 
 		# head of our doubly linked list 
 		self.order.add_to_head((key, value))
@@ -92,7 +92,7 @@ The `evict` method is responsible for removing the oldest entry in the cache and
 		# it from the tail of the linked list 
 		key_to_delete = self.order.tail.data[0]
 		del self.storage[key_to_delete]
-		
+
 		# remove the tail entry from our linked list 
 		self.order.remove_from_tail()
 ```
@@ -103,7 +103,7 @@ Now we need to implement the `fetch` method which accepts a key to an entry in t
 	def fetch(self, key):
 		if key not in self.storage:
 			return 
-		
+
 		entry = self.storage[key]
 		self.touch(entry)
 		return entry.data[1]
@@ -244,14 +244,14 @@ impl<A: Array> Default for LRUCache<A> {
 			tail: 0,
 			length: 0,
 		};
-		
+
 		// check to make sure that the capacity provided by
 		// the user is valid 
 		assert!(
 			cache.entries.capacity() < usize::max_value(),
 			“Capacity overflow”
 		);
-		
+
 		cache
 	}
 }
@@ -299,19 +299,19 @@ To complete our `IterMut` implementation, the only method we need to implement i
 		if self.done {
 			return None;
 		}
-		
+
 		// get the current entry and index
 		let entry = self.cache.entries[self.pos];
 		let index = self.pos;
-		
+
 		// we’re done iterating once we reach the tail entry
 		if self.pos == self.cache.tail {
 			self.done = true;
 		}
-		
+
 		// increment our position
 		self.pos = entry.next;
-		
+
 		Some((index, &mut entry.val))
 	}
 ```
@@ -399,12 +399,12 @@ where
 	pub fn len(&self) -> usize {
 		self.length
 	}	
-	
+
 	/// Indicates whether the cache is empty or not 
 	pub fn is_empty(&self) -> bool {
 		self.length == 0
 	}
-	
+
 	/// Returns an instance of our `IterMut` type 
 	/// We’ll keep this function private to minimize
 	/// the chance of mutable references to cache 
@@ -416,7 +416,7 @@ where
 			cache: self,
 		}
 	}
-	
+
 	/// Clears the cache of all entries 
 	pub fn clear(&mut self) {
 		self.entries.clear();
@@ -437,7 +437,7 @@ It will be convenient to add some methods for manipulating elements in our linke
 		// reference to the inner value 
 		self.entries.get(self.head).map(|e| &e.val)
 	}
-	
+
 	/// Returns a mutable reference to the element stored 
 	// at the head of the list 
 	pub fn front_mut(&mut self) -> Option<&mut T> {
@@ -445,7 +445,7 @@ It will be convenient to add some methods for manipulating elements in our linke
 		// mutable reference to the inner value
 		self.entries.get_mut(self.head).map(|e| &mut e.val)
 	}
-	
+
 	/// Takes an entry that has been added to the linked 
 	/// list and moves the head to the entry’s position 
 	fn push_front(&mut self, index: usize) {
@@ -455,10 +455,10 @@ It will be convenient to add some methods for manipulating elements in our linke
 			self.entries[index].next = self.head;
 			self.entries[self.head].prev = index;
 		}
-		
+
 		self.head = index;
 	}
-	
+
 	/// Remove the last entry from the list and returns
 	/// the index of the removed entry. Note that this 
 	/// only unlinks the entry from the list, it doesn’t
@@ -476,22 +476,22 @@ We’ll add one more method, `remove`, that takes as input an index into our arr
 ```rust
 	fn remove(&mut self, index: usize) {
 		assert!(self.length > 0);
-		
+
 		let prev = self.entries[index].prev;
 		let next = self.entries[index].next;
-		
+
 		if index == self.head {
 			self.head = next;
 		} else {
 			self.entries[prev].next = next;
 		}
-		
+
 		if index == self.tail {
 			self.tail = prev;
 		} else {
 			self.entries[next].prev = prev;
 		}
-		
+
 		self.length -= 1;
 	}
 ```
@@ -510,7 +510,7 @@ Let’s first define a helper method called `touch_index` that will receive an i
 	fn touch_index(&mut self, index: usize) {
 		if index != self.head {
 			self.remove(index);
-			
+
 			// need to increment `self.length` here since 
 			// `remove` decrements it 
 			self.length += 1;
@@ -553,7 +553,7 @@ We can implement a similar method, `lookup`, which will essentially do the same 
 		F: FnMut(&mut T) -> Option<R>,
 	{
 		let mut result = None;
-		
+
 		// iterate through our entries, testing each 
 		// using the predicate
 		for (i, entry) in self.iter_mut() {
@@ -562,7 +562,7 @@ We can implement a similar method, `lookup`, which will essentially do the same 
 				break;
 			}
 		}
-		
+
 		// once we’ve iterated through all entries, match 
 		// on the result to move it to the head of the list
 		// if necessary
@@ -587,7 +587,7 @@ We can now fetch existing entries from our cache, and those entries will be move
 			prev: 0,
 			next: 0,
 		};
-		
+
 		// check if the cache is at full capacity 
 		let new_head = if self.length == self.entries.capacity() {
 			// get the index of the oldest entry
@@ -601,7 +601,7 @@ We can now fetch existing entries from our cache, and those entries will be move
 			self.length += 1;
 			self.entries.len() - 1
 		};
-		
+
 		self.push_front(new_head);
 	}
 ```
