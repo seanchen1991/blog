@@ -27,7 +27,7 @@ So how do these two approaches play together when we have both a library portion
 ## Surfacing library errors
 
 In `src/lib.rs`, we have two functions, `Config::new` and `run`, which might return errors:
-```rust=
+```rust
 impl Config {
         pub fn new(mut args: env::Args) -> Result<Config, &'static str> {
             args.next();
@@ -72,17 +72,17 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 There are exactly three spots where errors are being returned: two errors occur in the `Config::new` function, which returns a `Result<Config, &'static str>`. In this case, the error variant of the `Result` is a static string slice.
 
 Here we return an error when a query is not provided by the user.
-```rust=
+```rust
 let query = match args.next() {
-        Some(arg) => arg,
+    Some(arg) => arg,
     None => return Err("Didn't get a query string"),
 };
 ```
 
 Here we return an error when a filename is not provided by the user.
-```rust=
+```rust
 let filename = match args.next() {
-        Some(arg) => arg,
+    Some(arg) => arg,
     None => return Err("Didn't get a file name"),
 };
 ```
@@ -92,7 +92,7 @@ The main problem with structuring our errors in this way as static strings is th
 The third error occurs at the top of `run` function, which returns a `Result<(), Box<dyn Error>>`. The error variant in this case is a [trait object][trait-object] that implements the `Error` [trait][error-trait]. In other words, the error variant for this function is any instance of a type that implements the `Error` trait. 
 
 Here we bubble up any errors that might have occurred as a result of calling `fs::read_to_string`.
-```rust=
+```rust
 let contents = fs::read_to_string(config.filename)?;
 ```
 
@@ -104,10 +104,10 @@ Ultimately, what we want to do is define all of these different types of errors 
 
 We'll create a new `src/error.rs` file and define an enum `AppError`, deriving the `Debug` trait in the process so that we can get a debug representation should we need it. We'll name each of the variants of this enum in such a way that they appropriately represent each of the three types of errors:
 
-```rust=
+```rust
 #[derive(Debug)]
 pub enum AppError {
-        MissingQuery,
+    MissingQuery,
     MissingFilename,
     ConfigLoad,
 }
@@ -122,7 +122,7 @@ Now that we have this type, we need to update all of the spots in our code where
 ### Returning variants of our `AppError`
 
 At the top of our `src/lib.rs` file, we need to declare our `error` module and bring `error::AppError` into scope:
-```rust=
+```rust
 mod error;
 
 use error::AppError;
@@ -130,19 +130,19 @@ use error::AppError;
 
 In our `Config::new` function, we need to update the spots where we were returning static string slices as errors, as well as the return type of the function itself:
 
-```diff=
+```diff
 - pub fn new(mut args: env::Args) -> Result<Config, &'static str>
 + pub fn new(mut args: env::Args) -> Result<Config, AppError>
     // --snip--
     
     let query = match args.next() {
-            Some(arg) => arg,
+        Some(arg) => arg,
 -       None => return Err("Didn't get a query string"),
 +       None => return Err(AppError::MissingQuery),
     };
 
     let filename = match args.next() {
-            Some(arg) => arg,
+        Some(arg) => arg,
 -       None => return Err("Didn't get a file name"),
 +       None => return Err(AppError::MissingFilename),
     };
@@ -152,7 +152,7 @@ In our `Config::new` function, we need to update the spots where we were returni
 
 The third error in the `run` function only requires us to update its return type, since the `?` operator is already taking care of bubbling the error up and returning it should it occur.
 
-```diff=
+```diff
 - pub fn run(config: Config) -> Result<(), Box<dyn Error>>
 + pub fn run(config: Config) -> Result<(), AppError>
 ```
@@ -174,7 +174,7 @@ thiserror = "1"
 
 In `src/error.rs` we'll bring the `thiserror::Error` trait into scope and have our `AppError` type derive it. We need this trait derived in order to annotate each enum variant with an `#[error]` block. Now we specify the error message that we want displayed for each particular variant: 
 
-```diff=
+```diff
 + use std::io;
 
 + use thiserror::Error;
@@ -182,13 +182,13 @@ In `src/error.rs` we'll bring the `thiserror::Error` trait into scope and have o
 - #[derive(Debug)]
 + #[derive(Debug, Error)]
 pub enum AppError {
-    +   #[error("Didn't get a query string")]
++   #[error("Didn't get a query string")]
     MissingQuery,
 +   #[error("Didn't get a file name")]
     MissingFilename,
 +   #[error("Could not load config")]
     ConfigLoad {
-    +       #[from] 
++       #[from] 
 +       source: io::Error,
 +   }
 }
@@ -220,27 +220,27 @@ Under the hood, `thiserror` performs some magic with procedural macros, which ca
 
 So on that note, we'll wrap up this post by ripping it out and replacing it with our own hand-rolled implementation. The nice thing about going down this route is that we'll only need to make changes to the `src/error.rs` file to implement all of the necessary changes (besides, of course, removing `thiserror` from our Cargo.toml).
 
-```diff=
+```diff
 [dependencies]
 - thiserror = "1"
 ```
 
 Let's remove all of the annotations that `thiserror` was providing us. We'll also replace the `thiserror::Error` trait with the `std::error::Error` trait:
 
-```diff=
+```diff
 - use thiserror::Error;
 + use std::error::Error;
 
 - #[derive(Debug, Error)]
 + #[derive(Error)]
 pub enum AppError {
-    -   #[error("Didn't get a query string")]
+-   #[error("Didn't get a query string")]
     MissingQuery,
 -   #[error("Didn't get a file name")]
     MissingFilename,
 -   #[error("Could not load config")]
     ConfigLoad {
-    -      #[from]
+-      #[from]
        source: io::Error,
     }
 }
@@ -254,13 +254,13 @@ In order to get back all of the functionality we just wiped, we'll need to do th
 
 Here's our implementation of the `Display` trait for our `AppError`. It maps each error variant to an string and writes it to the `Display` formatter.
 
-```rust=
+```rust
 use std::fmt;
 
 impl fmt::Display for AppError {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match self {
-                Self::MissingQuery => f.write_str("Didn't get a query string"),
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::MissingQuery => f.write_str("Didn't get a query string"),
             Self::MissingFilename => f.write_str("Didn't get a file name"),
             Self::ConfigLoad { source } => write!(f, "Could not load config: {}", source),
         }
@@ -270,13 +270,13 @@ impl fmt::Display for AppError {
 
 And here's our implementation of the `Error` trait. The main method to be implemented is the `Error::source` method, which is meant to provide information about the source of an error. For our `AppError` type, only `ConfigLoad` exposes any underlying source information, namely the I/O error that might happen as a result of calling `fs::read_to_string`. There's no underlying source information to expose in the case of the other error variants.
 
-```rust=
+```rust
 use std::error;
 
 impl error::Error for AppError {
-        fn source(&self) -> Option<&(dyn Error + 'static)> {
-            match self {
-                Self::ConfigLoad { source } => Some(source),
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            Self::ConfigLoad { source } => Some(source),
             _ => None,
         }
     }
@@ -287,10 +287,10 @@ The `&(dyn Error + 'static)` part of the return type is similar to the `Box<dyn 
 
 Lastly, we need a way to convert an `io::Error` into an `AppError`. We'll do this by impling `From<io::error> for AppError`.
 
-```rust=
+```rust
 impl From<io::Error> for AppError {
-        fn from(source: io::Error) -> Self {
-            Self::ConfigLoad { source }
+    fn from(source: io::Error) -> Self {
+        Self::ConfigLoad { source }
     }
 }
 ```
