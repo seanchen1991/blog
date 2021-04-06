@@ -33,19 +33,19 @@ impl Config {
             args.next();
 
         let query = match args.next() {
-                Some(arg) => arg,
+            Some(arg) => arg,
             None => return Err("Didn't get a query string"),
         };
 
         let filename = match args.next() {
-                Some(arg) => arg,
+            Some(arg) => arg,
             None => return Err("Didn't get a file name"),
         };
 
         let case_sensitive = env::var("CASE_INSENSITIVE").is_err();
 
         Ok(Config {
-                query,
+            query,
             filename,
             case_sensitive,
         })
@@ -53,16 +53,16 @@ impl Config {
 }
 
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
-        let contents = fs::read_to_string(config.filename)?;
+    let contents = fs::read_to_string(config.filename)?;
 
     let results = if config.case_sensitive {
-            search(&config.query, &contents)
+        search(&config.query, &contents)
     } else {
-            search_case_insensitive(&config.query, &contents)
+        search_case_insensitive(&config.query, &contents)
     };
 
     for line in results {
-            println!("{}", line);
+        println!("{}", line);
     }
 
     Ok(())
