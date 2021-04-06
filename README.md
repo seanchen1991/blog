@@ -6,6 +6,7 @@ Blog posts, mostly about Rust.
 
 | Date | Title | 
 |-|-|
+| 2021-04-06 | [A Beginner's Guide to Handling Errors in Rust](./posts/extending-minigrep/index.md) |
 | 2021-01-23 | [Implementing an LRU Cache in Rust](./posts/lru-cache/index.md) |
 | 2020-11-27 | [Semaphores in Rust](./posts/semaphores/index.md) |
 | 2020-08-18 | [Why I'm Switching from VSCode to OniVim 2](./posts/onivim2/index.md) |
