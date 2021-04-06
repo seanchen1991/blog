@@ -4,7 +4,6 @@ _June 3rd, 2020 | #rust | #open_source_
 I think tail call optimizations are pretty neat, particularly how they work to solve a fundamental issue with how recursive function calls execute. Functional languages like Haskell and those of the Lisp family, as well as logic languages (of which Prolog is probably the most well-known exemplar) emphasize recursive ways of thinking about problems. These languages have much to gain performance-wise by taking advantage of tail call optimizations.
 
 > Note: I won't be describing what tail calls are in this post. Here are a number of good resources to refer to:
-
 > - The YouTube channel Computerphile has a [video](https://youtu.be/_JtPhF8MshA) where they walk through examples of tail-recursive functions in painstaking detail.
 > - A detailed explanation on [Stack Overflow](https://stackoverflow.com/questions/310974/what-is-tail-call-optimization) on the concept.
 
