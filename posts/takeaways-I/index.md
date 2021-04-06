@@ -1,10 +1,5 @@
----
-title: "Takeaways from My Initial Exposure to Rust"
-date: "2020-05-27T11:50:00-07:00"
-tags:
-- Rust
-- Introspection
----
+# Takeaways from My Initial Exposure to Rust
+_May 27th, 2020 | #rust | #introspection_
 
 My journey into learning Rust and getting into its wonderful open source community has been, on the whole, pretty stop-and-go.
 
@@ -14,8 +9,7 @@ I was introduced to Rust way back in 2014, probably around the time when it was 
 
 He was (and still is?) a rather ardent advocate for Rust, citing its algebraic data types and its functional idioms. While my memories of that time are rather hazy, one thing I can say with absolute certainty is that I had zero idea of what any of it meant; I just nodded my head and pretended I understood.
 
-To his credit, this TA, perhaps noticing my wide-eyed curiosity, mentored me in writing a tiny Rust library that I published on my then-fledgling GitHub account. I had very little idea what any of the
-code he helped me write meant, though it was apparently a useful utility for him that he pulled in as a dependency on whatever crazy project he was working on at the time.
+To his credit, this TA, perhaps noticing my wide-eyed curiosity, mentored me in writing a tiny Rust library that I published on my then-fledgling GitHub account. I had very little idea what any of the code he helped me write meant, though it was apparently a useful utility for him that he pulled in as a dependency on whatever crazy project he was working on at the time.
 
 ## First Public Rust Code
 
@@ -81,9 +75,7 @@ impl Writer for MemStream {
 
 It’s essentially a wrapper around a `Vec<u8>` that implements the `std::io::Reader` and `std::io::Writer` traits. `Reader`s are objects that can be read from, while `Writer`s are objects that can be written to. Files would be one prime example of something that requires these traits. 
 
-{{% notice note %}}
-Since those early pre-1.0 days, the trait names have been shorted from `Reader` and `Writer` to just `Read` and `Write`. Evidently, back in 0.8, the `Write` trait only required a `write` method to fulfill the trait. Nowadays, a `flush` method is also required as a way to completely drain all of the contents of the `Write`r.
-{{% /notice %}}
+> Note: Since those early pre-1.0 days, the trait names have been shorted from `Reader` and `Writer` to just `Read` and `Write`. Evidently, back in 0.8, the `Write` trait only required a `write` method to fulfill the trait. Nowadays, a `flush` method is also required as a way to completely drain all of the contents of the `Write`r.
 
 Looking back at it now, it’s pretty cool to see that, even in its pre-1.0 days, Rust code really doesn’t look all that different from its current incarnation.
 
