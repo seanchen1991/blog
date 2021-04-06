@@ -28,15 +28,15 @@ With a loose specification of the requirements of our LRU cache, we can define t
 from doubly_linked_list import DoublyLinkedList
 
 class LRUCache:
-	def __init__(self, capacity=100):
-		# the max number of entries the cache can hold
-		self.capacity = capacity
-		# the hash map for storing entries as key-value pairs 
-		# it’s what allows us to efficiently fetch entries 
-		self.storage = dict()
-		# a doubly linked list for keeping track of the order
-		# of elements in our cache 
-		self.order = DoublyLinkedList()
+    def __init__(self, capacity=100):
+	# the max number of entries the cache can hold
+	self.capacity = capacity
+	# the hash map for storing entries as key-value pairs 
+	# it’s what allows us to efficiently fetch entries 
+	self.storage = dict()
+	# a doubly linked list for keeping track of the order
+	# of elements in our cache 
+	self.order = DoublyLinkedList()
 ```
 
 > Note: We won’t be going over the design and implementation of the `DoublyLinkedList` that we’re using here, though its code is included in the GitHub repo should you wish to take a look. 
@@ -48,28 +48,28 @@ Let’s first define our `insert` method. It takes a key-value pair, where the v
 Additionally, if it turns out the cache is already at max capacity, we’ll need to evict the oldest entry in the cache:
 
 ```python
-	def insert(self, key, value):
-		# if the key is already in the cache, overwrite 
-		# its value 
-		if key in self.storage:
-			entry = self.storage[key]
-			entry.data = (key, value)
-			# touch this entry to move it to the head of 
-			# the linked list
-			self.touch(entry)
-			return
+    def insert(self, key, value):
+	# if the key is already in the cache, overwrite 
+	# its value 
+	if key in self.storage:
+	    entry = self.storage[key]
+	    entry.data = (key, value)
+	    # touch this entry to move it to the head of 
+	    # the linked list
+	    self.touch(entry)
+	    return
 
-		# check if our cache is at max capacity to see
-		# if we need to evict the oldest entry 
-		if len(self.storage) == self.capacity:
-			self.evict()
+	# check if our cache is at max capacity to see
+	# if we need to evict the oldest entry 
+	if len(self.storage) == self.capacity:
+	    self.evict()
 
-		# add the key and value as a node at the 
-		# head of our doubly linked list 
-		self.order.add_to_head((key, value))
-		# add the linked list node as the value of 
-		# the key in our storage dictionary
-		self.storage[key] = self.order.head
+	# add the key and value as a node at the 
+	# head of our doubly linked list 
+	self.order.add_to_head((key, value))
+	# add the linked list node as the value of 
+	# the key in our storage dictionary
+	self.storage[key] = self.order.head
 ```
 
 Each linked list node is storing a tuple of the `key` and the `value`. Each key-value pair in `self.storage` consists of the `key` as its key and a linked list node as its value:
@@ -79,34 +79,34 @@ Each linked list node is storing a tuple of the `key` and the `value`. Each key-
 Let’s implement the `touch` method, which is responsible for moving an entry in our cache to the most-recently-added spot in our cache. Our doubly linked list implementation has a method `move_to_front` that takes a node and does the work of moving it from wherever it is in the list to the head; we’ll use it here in our `touch` implementation:
 
 ```python
-	def touch(self, entry):
-		self.order.move_to_front(entry)
+    def touch(self, entry):
+	self.order.move_to_front(entry)
 ```
 
 The `evict` method is responsible for removing the oldest entry in the cache and is called only when we attempt to insert into the cache when it is already at max capacity. It needs to remove the node at the tail of the linked list, as well as make sure the key that referred to the oldest entry is also removed from `self.storage`:
 
 ```python
-	def evict(self):
-		# delete the key-value pair from the storage dict 
-		# we can get the oldest entry’s key by accessing 
-		# it from the tail of the linked list 
-		key_to_delete = self.order.tail.data[0]
-		del self.storage[key_to_delete]
+    def evict(self):
+	# delete the key-value pair from the storage dict 
+	# we can get the oldest entry’s key by accessing 
+	# it from the tail of the linked list 
+	key_to_delete = self.order.tail.data[0]
+	del self.storage[key_to_delete]
 
-		# remove the tail entry from our linked list 
-		self.order.remove_from_tail()
+	# remove the tail entry from our linked list 
+	self.order.remove_from_tail()
 ```
 
 Now we need to implement the `fetch` method which accepts a key to an entry in the cache, checks whether the key exists, then returns the value associated with the key. This method also moves the entry to the head of the linked list as this entry is now the most-recently-used entry in the cache.
 
 ```python
-	def fetch(self, key):
-		if key not in self.storage:
-			return 
+    def fetch(self, key):
+	if key not in self.storage:
+	    return 
 
-		entry = self.storage[key]
-		self.touch(entry)
-		return entry.data[1]
+	entry = self.storage[key]
+	self.touch(entry)
+	return entry.data[1]
 ```
 
 The full code for the Python implementation, as well as a suite of tests, can be found [here][python-impl]. 
@@ -143,12 +143,12 @@ Let’s start off by defining an `Entry` type inside the `src/lib.rs` file of a 
 
 ```rust
 pub struct Entry<T> {
-	/// The value stored in this entry
-	val: T,
-	/// Index of the previous entry in the cache
-	prev: usize,
-	/// Index of the next entry in the cache
-	next: usize,
+    /// The value stored in this entry.
+    val: T,
+    /// Index of the previous entry in the cache
+    prev: usize,
+    /// Index of the next entry in the cache
+    next: usize,
 }
 ```
 
