@@ -1,11 +1,5 @@
----
-title: "Some Learnings from Implementing a Normalizing Rust Representer"
-date: "2020-07-13T11:50:00-07:00"
-tags:
-- Rust
-- Exercism
-- Open Source
----
+# Some Learnings from Implementing a Normalizing Rust Representer
+_July 13th, 2020 | #rust | #exercism | #open_source_
 
 I’ve been helping out and contributing to [exercism.io](https://exercism.io) for the past few months. As an open source platform for learning programming languages that supports Rust, Exercism aligns very well with all the things I’m currently passionate about: open source, teaching, and Rust. 
 

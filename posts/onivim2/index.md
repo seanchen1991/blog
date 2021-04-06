@@ -1,5 +1,5 @@
 # Why I'm Switching from VSCode to OniVim 2
-_August 18th, 2020 · #open_source_
+_August 18th, 2020 | #open_source_
 
 As someone interested in open source sustainability, I recently heard about a very interesting open source licensing scheme that a project called [OniVim 2](https://github.com/onivim/oni2) uses. The central premise of the project itself is to combine the efficient modal editing functionality of Vim with a modern text editor UI.
 

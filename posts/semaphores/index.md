@@ -1,19 +1,11 @@
----
-title: "Implementing Synchronization Primitives in Rust: Semaphores"
-date: "2020-11-27T20:00:00-06:00"
-tags: 
-- Rust
-- Synchronization Primitives
-- The Little Book of Semaphores
----
+# Implementing Synchronization Primitives in Rust: Semaphores
+_November 27th, 2020 | #rust | #synchronization_primitives | #the_little_book_of_semaphores | #intermediate_
 
-{{% notice note %}}
-I recently stumbled upon Allen Downey’s [_The Little Book of Semaphores_](https://greenteapress.com/wp/semaphores), which is a short, sweet, and to-the-point textbook on the topic of synchronization. 
+> Note: I recently stumbled upon Allen Downey’s [_The Little Book of Semaphores_](https://greenteapress.com/wp/semaphores), which is a short, sweet, and to-the-point textbook on the topic of synchronization. 
 
-Naturally, reading through the book inspired me to implement these synchronization primitives and problems in Rust.
+> Naturally, reading through the book inspired me to implement these synchronization primitives and problems in Rust.
 
-I hope others find this exploration interesting, insightful, and/or helpful! 🙂
-{{% /notice %}}
+> I hope others find this exploration interesting, insightful, and/or helpful! 🙂
 
 Implementing synchronization primitives in Rust in a safe fashion is a bit strange in a circular kind of way. It’s similar to implementing a hash map in JavaScript: since everything in JS boils down to an Object, you’re essentially implementing a hash map using hash maps!
 
