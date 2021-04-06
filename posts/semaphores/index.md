@@ -2,9 +2,7 @@
 _November 27th, 2020 | #rust | #synchronization_primitives | #the_little_book_of_semaphores | #intermediate_
 
 > Note: I recently stumbled upon Allen Downey’s [_The Little Book of Semaphores_](https://greenteapress.com/wp/semaphores), which is a short, sweet, and to-the-point textbook on the topic of synchronization. 
-
 > Naturally, reading through the book inspired me to implement these synchronization primitives and problems in Rust.
-
 > I hope others find this exploration interesting, insightful, and/or helpful! 🙂
 
 Implementing synchronization primitives in Rust in a safe fashion is a bit strange in a circular kind of way. It’s similar to implementing a hash map in JavaScript: since everything in JS boils down to an Object, you’re essentially implementing a hash map using hash maps!
@@ -19,9 +17,7 @@ Semaphores are one of the simplest synchronization primitives upon which more co
 
 Conceptually, a semaphore is just an integer that can only be incremented and decremented in an atomic fashion. You can imagine that the integer represents some number of resources that only a certain number of threads are able to access or acquire at the same time. 
 
-{{% notice info %}}
-The term _atomic_ means that even when multiple threads are all attempting to change the value of the semaphore, those changes occur in a sequential (and thus deterministic) order. 
-{{% /notice %}}
+> Note: The term _atomic_ means that even when multiple threads are all attempting to change the value of the semaphore, those changes occur in a sequential (and thus deterministic) order. 
 
 There are different implications depending on whether the integer is in a positive or negative state. If it’s in a positive state `n`, this means that `n` threads are able to access the protected resource. If it’s in a negative state `-n`, this means that `n` threads are all blocked and waiting for access to the protected resource. 
 

@@ -115,7 +115,7 @@ This receives as input a tail-recursive function contained in a `BorrowRec` inst
 
 ## Are We TCO Yet?
 
-So that’s it right? tramp.rs is the hero we all needed to enable on-demand TCO in our Rust programs, right?
+So that’s it right? `tramp.rs` is the hero we all needed to enable on-demand TCO in our Rust programs, right?
 
 I’m afraid not.
 
