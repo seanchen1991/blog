@@ -2,7 +2,7 @@
 
 _April 5th, 2021 · #rust · #error_handling · #beginner_
 
-The example projects in _The Rust Programming Language_ are great for introducing new would-be Rustaceans to different aspects and features of Rust. In this post, we'll be looking at some different ways of implementing a more robust error handling infrastructure but bolstering the `minigrep` project from _The Rust Programming Language_.
+The example projects in _The Rust Programming Language_ are great for introducing new would-be Rustaceans to different aspects and features of Rust. In this post, we'll be looking at some different ways of implementing a more robust error handling infrastructure by extending the `minigrep` project from _The Rust Programming Language_.
 
 The `minigrep` project is introduced in [chapter 12][ch12] and walks the reader through building a simple version of the `grep` command line tool, which is a utility for searching through text. For example, you'd pass in a query, the text you're searching for, along with the file name where the text lives, and get back all of the lines that contain the query text. 
 
