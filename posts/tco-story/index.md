@@ -1,19 +1,12 @@
----
-title: "The Story of Tail Call Optimizations in Rust"
-date: "2020-06-03T20:00:00-07:00"
-tags:
-- Rust
-- Open Source
----
+# The Story of Tail Call Optimizations in Rust
+_June 3rd, 2020 | #rust | #open_source_
 
 I think tail call optimizations are pretty neat, particularly how they work to solve a fundamental issue with how recursive function calls execute. Functional languages like Haskell and those of the Lisp family, as well as logic languages (of which Prolog is probably the most well-known exemplar) emphasize recursive ways of thinking about problems. These languages have much to gain performance-wise by taking advantage of tail call optimizations.
 
-{{% notice info %}}
-I won't be describing what tail calls are in this post. Here are a number of good resources to refer to:
+> Note: I won't be describing what tail calls are in this post. Here are a number of good resources to refer to:
 
-- The YouTube channel Computerphile has a [video](https://youtu.be/_JtPhF8MshA) where they walk through examples of tail-recursive functions in painstaking detail.
-- A detailed explanation on [Stack Overflow](https://stackoverflow.com/questions/310974/what-is-tail-call-optimization) on the concept.
-{{% /notice %}}
+> - The YouTube channel Computerphile has a [video](https://youtu.be/_JtPhF8MshA) where they walk through examples of tail-recursive functions in painstaking detail.
+> - A detailed explanation on [Stack Overflow](https://stackoverflow.com/questions/310974/what-is-tail-call-optimization) on the concept.
 
 With the recent trend over the last few years of emphasizing functional paradigms and idioms in the programming community, you would think that tail call optimizations show up in many compiler/interpreter implementations. And yet, it turns out that many of these popular languages _don’t_ implement tail call optimization. JavaScript had it up till a few years ago, when it removed support for it [1](https://stackoverflow.com/questions/42788139/es6-tail-recursion-optimisation-stack-overflow). Python doesn’t support it [2](http://neopythonic.blogspot.com/2009/04/final-words-on-tail-calls.html). Neither does Rust. 
 
@@ -25,7 +18,7 @@ Tail-recursive functions, if run in an environment that doesn’t support TCO, e
 
 One way to achieve this is to have the compiler, once it realizes it needs to perform TCO, transform the tail-recursive function execution to use an iterative loop. This means that the result of the tail-recursive function is calculated using just a single stack frame. Ta-da! Constant memory usage.
 
-![Drawing Pseudocode](pseudocode.jpg)
+![Drawing Pseudocode](../../assets/tco-story/pseudocode.jpg)
 
 With that, let’s get back to the question of why Rust doesn’t exhibit TCO.
 
@@ -33,7 +26,7 @@ With that, let’s get back to the question of why Rust doesn’t exhibit TCO.
 
 The earliest references to tail call optimizations in Rust I could dig up go all the way back to the Rust project’s inception. I found [this][mailing_list] mailing list thread from 2013, where Graydon Hoare enumerates his points for why he didn’t think tail call optimizations belonged in Rust:
 
-![Mailing list](mailing-list.jpg)
+![Mailing list](../../assets/tco-story/mailing-list.jpg)
 
 That mailing list thread refers to [this][gh_issue] GitHub issue, circa 2011, when the initial authors of the project were grappling with how to implement TCO in the then-budding compiler. The heart of the problem seemed to be due to incompatibilities with LLVM at the time; to be fair, a lot of what they’re talking about in the issue goes over my head.
 
@@ -68,7 +61,7 @@ implementation, and then successively implement faster methods for each architec
 
 Bruno Corrêa Zimmermann’s [tramp.rs][tramp_rs] library is probably the most high-profile of these library solutions. Let’s take a peek under the hood and see how it works.
 
-## Diving Into tramp.rs
+## Diving Into `tramp.rs`
 
 The tramp.rs library exports two macros, `rec_call!` and `rec_ret!`, that facilitate the same behavior as what the proposed `become` keyword would do: it allows the programmer to prompt the Rust runtime to execute the specified tail-recursive function via an iterative loop, thereby decreasing the memory cost of the function to a constant.
 
@@ -93,11 +86,8 @@ enum BorrowRec<'a, T> {
 
 The `BorrowRec` enum represents two possible states a tail-recursive function call can be in at any one time: either it hasn’t reached its base case yet, in which case we’re still in the `BorrowRec::Call` state, or it has reached a base case and has produced its final value(s), in which case we’ve arrived at the `BorrowRec::Ret` state.
 
-{{% notice note %}}
-Modeling the state of recursive functions in this way, with a `Call` state representing the fact that the function is still recursing and a `Ret` state indicating that the function has arrived at a base case, reminds me a lot of how async Promises are modeled. 
-
-Promises can be in one of three states, "pending", meaning it's still waiting on an asynchronous operation, "resolved", meaning the asynchronous operation occurred successfully, and "rejected", meaning the asynchronous operation did not occur successfully.
-{{% /notice %}}
+> Note: Modeling the state of recursive functions in this way, with a `Call` state representing the fact that the function is still recursing and a `Ret` state indicating that the function has arrived at a base case, reminds me a lot of how async Promises are modeled. 
+> Promises can be in one of three states, "pending", meaning it's still waiting on an asynchronous operation, "resolved", meaning the asynchronous operation occurred successfully, and "rejected", meaning the asynchronous operation did not occur successfully.
 
 The `Call` variant of the `BorrowRec` enum contains the following definition for a `Thunk`:
 
@@ -132,11 +122,11 @@ I’m afraid not.
 
 While I really like how the idea of trampolining as a way to incrementally introduce TCO is presented in this implementation, [benchmarks][benchmarks] that [@timthelion][timthelion] has graciously already run indicate that using tramp.rs leads to a slight regression in performance compared to manually converting the tail-recursive function to an iterative loop.
 
-![timthelion's benchmarks](timthelion-comment.png)
+![timthelion's benchmarks](../../assets/tco-story/timthelion-comment.png)
 
 Part of what contributes to the slowdown of tramp.rs’s performance is likely, as [@jonhoo][jonhoo] points out, the fact that each `rec_call!` call allocates memory on the heap due to it calling `Thunk::new`:
 
-![Jon Gjenset weighing in](jonhoo-comment.png)
+![Jon Gjenset weighing in](../../assets/tco-story/jonhoo-comment.png)
 
 So it turns that tramp.rs’s trampolining implementation doesn’t even actually achieve the constant memory usage that TCO promises!
 

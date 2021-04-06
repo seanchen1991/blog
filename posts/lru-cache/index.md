@@ -29,19 +29,17 @@ from doubly_linked_list import DoublyLinkedList
 
 class LRUCache:
     def __init__(self, capacity=100):
-	    # the max number of entries the cache can hold
-	    self.capacity = capacity
-	    # the hash map for storing entries as key-value pairs 
-	    # it’s what allows us to efficiently fetch entries 
-	    self.storage = dict()
-	    # a doubly linked list for keeping track of the order
-    	# of elements in our cache 
-    	self.order = DoublyLinkedList()
+		# the max number of entries the cache can hold
+		self.capacity = capacity
+		# the hash map for storing entries as key-value pairs 
+		# it’s what allows us to efficiently fetch entries 
+		self.storage = dict()
+		# a doubly linked list for keeping track of the order
+   		# of elements in our cache 
+   		self.order = DoublyLinkedList()
 ```
 
-{{% notice note %}}
-We won’t be going over the design and implementation of the `DoublyLinkedList` that we’re using here, though its code is included in the GitHub repo should you wish to take a look. 
-{{% /notice %}}
+> Note: We won’t be going over the design and implementation of the `DoublyLinkedList` that we’re using here, though its code is included in the GitHub repo should you wish to take a look. 
 
 Our cache’s constructor receives a single optional parameter specifying the maximum number of entries that the cache can hold, which is stored in the `self.capacity` variable. The `self.storage` dictionary associates keys with the contents of the cache that we actually care about. `self.order` stores a `DoublyLinkedList` whose sole job is to keep track of the order of entries in the cache: the newest entry in the list will always be at the head of the list, and the oldest entry will always be at the tail. 
 
