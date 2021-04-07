@@ -1,5 +1,5 @@
 # A Beginner's Guide to Handling Errors in Rust
-## Part I: Minigrep
+# Part I: Minigrep
 
 _April 5th, 2021 · #rust · #error_handling · #beginner_
 
