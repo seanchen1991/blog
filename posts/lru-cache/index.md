@@ -356,7 +356,7 @@ Here, we’re getting a compiler error because our code is saying that our `Iter
 Let’s try changing the line this to take a mutable reference to the current entry instead, which is what our `IterMut` type is looking to do anyway: 
 
 ```rust
-    entry = &mut self.cache.entries[self.pos];
+    let entry = &mut self.cache.entries[self.pos];
 ```
 
 This change yields a different error:
