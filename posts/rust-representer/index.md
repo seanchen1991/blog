@@ -94,7 +94,7 @@ Starting off with this sets up a nice boundary in which we can work within. Now 
 
 The `syn` crate provides an extremely handy trait called `VisitMut`, which provides the user with a lot of flexibility when it comes to traversing and mutating AST nodes in-place. The `VisitMut` trait exposes a whole slew of methods for accessing every type of AST node that `syn` differentiates.
 
-![Just some of the methods on the `visit_mut` trait](visit_mut_methods.png)
+![Just some of the methods on the `visit_mut` trait](assets/visit_mut_methods.png)
 
 A logical first place to start would be replacing the identifier name of a `let` binding, taking something as simple as 
 

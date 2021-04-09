@@ -74,7 +74,7 @@ Additionally, if it turns out the cache is already at max capacity, we’ll need
 
 Each linked list node is storing a tuple of the `key` and the `value`. Each key-value pair in `self.storage` consists of the `key` as its key and a linked list node as its value:
 
-![Layout of the Python LRU implementation](../../assets/lru-cache/python-impl-layout.png)
+![Layout of the Python LRU implementation](assets/lru-cache/python-impl-layout.png)
 
 Let’s implement the `touch` method, which is responsible for moving an entry in our cache to the most-recently-added spot in our cache. Our doubly linked list implementation has a method `move_to_front` that takes a node and does the work of moving it from wherever it is in the list to the head; we’ll use it here in our `touch` implementation:
 
@@ -115,7 +115,7 @@ The full code for the Python implementation, as well as a suite of tests, can be
 
 Our Python implementation liberally allocates objects in memory, most notably the two distinct data structures, a dictionary and a doubly linked list (which itself allocates lots of linked list nodes), with linked list nodes referring to one another, along with the dictionary referring to these nodes as well. This is an example of what Jim Blandy and Jason Orendorff call a “sea of objects” in their book  _Programming Rust_:
 
-![Taking arms against a sea of objects](../../assets/lru-cache/sea-of-objects.png)
+![Taking arms against a sea of objects](assets/lru-cache/sea-of-objects.png)
 
 Automatic memory management makes this kind of memory architecture tenable: cyclical references are handled by the garbage collector. The tradeoff here is that programmers are able to develop working software without having to do as much up-front planning, at the cost of taking a performance hit due to the garbage collection process. 
 
@@ -131,7 +131,7 @@ But wait! There’s actually a third route we could take that circumvents these 
 
 Each “node” in our array-backed doubly linked list, instead of referencing other node objects directly, will instead refer to the array indices where the node’s previous and next nodes reside in the array. This is certainly a more abstract way to implement a doubly linked list, though it gets the job done and has some important benefits for our use case, most notably that introducing an extra level of indirection by having each linked list node reference the array index of another linked list node completely circumvents the multiple owners issue that comes with the territory of doubly linked lists. 
 
-![An array-backed doubly linked list](../../assets/lru-cache/array-backed-dll.png)
+![An array-backed doubly linked list](assets/lru-cache/array-backed-dll.png)
 
 Now, since all of our cache entries are being stored in an array, it would be straightforward to layer on a `HashMap` as part of our implementation where we store keys that are associated with a particular cache entry’s index in the array. 
 

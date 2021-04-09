@@ -3,7 +3,7 @@ _August 18th, 2020 | #open_source_
 
 As someone interested in open source sustainability, I recently heard about a very interesting open source licensing scheme that a project called [OniVim 2](https://github.com/onivim/oni2) uses. The central premise of the project itself is to combine the efficient modal editing functionality of Vim with a modern text editor UI.
 
-![OniVim's design is clearly inspired by VSCode](../../assets/onivim2/onivim.png)
+![OniVim's design is clearly inspired by VSCode](assets/onivim2/onivim.png)
 
 ## How OniVim’s Licensing Scheme Works
 
@@ -11,7 +11,7 @@ The OniVim 2 editor is currently under active development by [Outrun Labs](https
 
 Anyone can freely use the 18-month-old version of the project. For those who wish use the up-to-date version, a commercial license must be purchased.
 
-![A timeline of OniVim's licensing scheme](../../assets/onivim2/license_timeline.jpg)
+![A timeline of OniVim's licensing scheme](assets/onivim2/license_timeline.jpg)
 
 You can read more about the why and how of this scheme [here](https://onivim.github.io/docs/other/motivation#a-new-model-for-sustainability).
 
