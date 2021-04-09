@@ -130,7 +130,7 @@ mod tests {
     }
 }
 ```
-
+ 
 In the next post we’ll be using our homebrew semaphore to implement some other synchronization primitives!
 
 [condvar]: https://doc.rust-lang.org/std/sync/struct.Condvar.html
