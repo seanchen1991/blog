@@ -297,23 +297,23 @@ To complete our `IterMut` implementation, the only method we need to implement i
     fn next(&mut self) -> Option<Self::Item> {
         // check if we’ve iterated through all entries 
         if self.done {
-        return None;
+            return None;
+        }
+
+        // get the current entry and index
+        let entry = self.cache.entries[self.pos];
+        let index = self.pos;
+
+        // we’re done iterating once we reach the tail entry
+        if self.pos == self.cache.tail {
+            self.done = true;
+        }
+
+        // increment our position
+        self.pos = entry.next;
+
+        Some((index, &mut entry.val))
     }
-
-    // get the current entry and index
-    let entry = self.cache.entries[self.pos];
-    let index = self.pos;
-
-    // we’re done iterating once we reach the tail entry
-    if self.pos == self.cache.tail {
-        self.done = true;
-    }
-
-    // increment our position
-    self.pos = entry.next;
-
-    Some((index, &mut entry.val))
-}
 ```
 
 However, if you try to compile this code, you’ll get the following errors:
