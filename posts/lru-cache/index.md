@@ -169,14 +169,14 @@ Then in `src/lib.rs`:
 use arrayvec::ArrayVec;
 
 pub struct LRUCache {
-	/// Our `ArrayVec` will be storing `Entry`s 
-	entries: ArrayVec<Entry>,
-	/// Index of the first entry in the cache
-	head: usize,
-	/// Index of the last entry in the cache
-	tail: usize,
-	/// The number of entries in the cache
-	length: usize,
+    /// Our `ArrayVec` will be storing `Entry`s 
+    entries: ArrayVec<Entry>,
+    /// Index of the first entry in the cache
+    head: usize,
+    /// Index of the last entry in the cache
+    tail: usize,
+    /// The number of entries in the cache
+    length: usize,
 }
 ```
 
@@ -219,10 +219,10 @@ use arrayvec::{Array, ArrayVec};  // new import here
 // we’re saying here that any type our cache stores 
 // must implement the `Array` trait
 pub struct LRUCache<A: Array> {
-	entries: ArrayVec<A>,  // add the type parameter here 
-	head: usize,
-	tail: usize,
-	length: usize,
+    entries: ArrayVec<A>,  // add the type parameter here 
+    head: usize,
+    tail: usize,
+    length: usize,
 }
 ```
 
@@ -237,23 +237,23 @@ We’ll start off with implementing a way to initialize a new `LRUCache` instanc
 // is by using specifying a type that implements the 
 // `Array` trait, namely `<[type; capacity]>`
 impl<A: Array> Default for LRUCache<A> {
-	fn default() -> Self {
-		let cache = LRUCache {
-			entries: ArrayVec::new(),
-			head: 0,
-			tail: 0,
-			length: 0,
-		};
+    fn default() -> Self {
+        let cache = LRUCache {
+            entries: ArrayVec::new(),
+            head: 0,
+            tail: 0,
+            length: 0,
+        };
 
-		// check to make sure that the capacity provided by
-		// the user is valid 
-		assert!(
-			cache.entries.capacity() < usize::max_value(),
-			“Capacity overflow”
-		);
+        // check to make sure that the capacity provided by
+        // the user is valid 
+        assert!(
+            cache.entries.capacity() < usize::max_value(),
+            “Capacity overflow”
+        );
 
-		cache
-	}
+        cache
+    }
 }
 ```
 
@@ -269,9 +269,9 @@ The first thing we need to do is define a type that keeps track of the state of 
 // keeps track of where we currently are over 
 // the course of iteration 
 struct IterMut<‘a, A: ‘a + Array> {
-	cache: &’a mut LRUCache<A>,
-	pos: usize,
-	done: bool,
+    cache: &’a mut LRUCache<A>,
+    pos: usize,
+    done: bool,
 }
 ```
 
@@ -282,10 +282,10 @@ Starting off the `Iterator` implementation for our `IterMut` type, we continue t
 ```rust
 impl<‘a, T, A> Iterator for IterMut<‘a, A>
 where
-	T: ‘a,
-	A: ‘a + Array<Item = Entry<T>>,
+    T: ‘a,
+    A: ‘a + Array<Item = Entry<T>>,
 {
-	type Item = (usize, &’a mut T);
+    type Item = (usize, &’a mut T);
 }
 ```
 
@@ -294,26 +294,26 @@ The `type Item = (usize, &’a mut T);` line indicates that each iteration yield
 To complete our `IterMut` implementation, the only method we need to implement is a `next` method that either returns an `Item` or `None` if there are no more items to be yielded from the iteration:
 
 ```rust
-	fn next(&mut self) -> Option<Self::Item> {
-		// check if we’ve iterated through all entries 
-		if self.done {
-			return None;
-		}
+    fn next(&mut self) -> Option<Self::Item> {
+        // check if we’ve iterated through all entries 
+        if self.done {
+        return None;
+    }
 
-		// get the current entry and index
-		let entry = self.cache.entries[self.pos];
-		let index = self.pos;
+    // get the current entry and index
+    let entry = self.cache.entries[self.pos];
+    let index = self.pos;
 
-		// we’re done iterating once we reach the tail entry
-		if self.pos == self.cache.tail {
-			self.done = true;
-		}
+    // we’re done iterating once we reach the tail entry
+    if self.pos == self.cache.tail {
+        self.done = true;
+    }
 
-		// increment our position
-		self.pos = entry.next;
+    // increment our position
+    self.pos = entry.next;
 
-		Some((index, &mut entry.val))
-	}
+    Some((index, &mut entry.val))
+}
 ```
 
 However, if you try to compile this code, you’ll get the following errors:
@@ -356,7 +356,7 @@ Here, we’re getting a compiler error because our code is saying that our `Iter
 Let’s try changing the line this to take a mutable reference to the current entry instead, which is what our `IterMut` type is looking to do anyway: 
 
 ```rust
-	let entry = &mut self.cache.entries[self.pos];
+    entry = &mut self.cache.entries[self.pos];
 ```
 
 This change yields a different error:
@@ -377,7 +377,7 @@ Moreover, the compiler also cannot prove that subsequent `next` calls won’t se
 In order to resolve this, we’re going to tell the compiler to trust us and opt for the backdoor option of dipping into some unsafe code here. We’ll take a raw pointer to each cache entry, which is essentially us telling the compiler that whatever this raw pointer refers to will not cause undefined behavior, because we know that it won’t, so long as we use `IterMut` in the intended way.
 
 ```rust
-	let entry = unsafe { &mut *(&mut self.cache.entries[self.pos] as *mut Entry<T>) };
+    let entry = unsafe { &mut *(&mut self.cache.entries[self.pos] as *mut Entry<T>) };
 ```
 
 If this makes you uneasy (and honestly, it probably should at least a little bit), well, you can at least take some solace in that fact that this isn’t production code that has any possibility of causing actual problems of consequence down the line 🙂
@@ -393,107 +393,107 @@ We’ll start off by getting the easy methods out of the way:
 // parameterized over into our `impl` block
 impl<T, A> LRUCache<A>
 where
-	A: Array<Item = Entry<T>>,
+    A: Array<Item = Entry<T>>,
 {
-	/// Returns the number of entries in the cache
-	pub fn len(&self) -> usize {
-		self.length
-	}	
+    /// Returns the number of entries in the cache
+    pub fn len(&self) -> usize {
+        self.length
+    }	
 
-	/// Indicates whether the cache is empty or not 
-	pub fn is_empty(&self) -> bool {
-		self.length == 0
-	}
+    /// Indicates whether the cache is empty or not 
+    pub fn is_empty(&self) -> bool {
+        self.length == 0
+    }
 
-	/// Returns an instance of our `IterMut` type 
-	/// We’ll keep this function private to minimize
-	/// the chance of mutable references to cache 
-	/// entries being used incorrectly 
-	fn iter_mut(&mut self) -> IterMut<A> {
-		IterMut {
-			pos: self.head,
-			done: self.is_empty(),
-			cache: self,
-		}
-	}
+    /// Returns an instance of our `IterMut` type 
+    /// We’ll keep this function private to minimize
+    /// the chance of mutable references to cache 
+    /// entries being used incorrectly 
+    fn iter_mut(&mut self) -> IterMut<A> {
+        IterMut {
+            pos: self.head,
+            done: self.is_empty(),
+            cache: self,
+        }
+    }
 
-	/// Clears the cache of all entries 
-	pub fn clear(&mut self) {
-		self.entries.clear();
-		self.head = 0;
-		self.tail = 0;
-		self.length = 0;
-	}
+    /// Clears the cache of all entries 
+    pub fn clear(&mut self) {
+        self.entries.clear();
+        self.head = 0;
+        self.tail = 0;
+        self.length = 0;
+    }
 }
 ```
 
 It will be convenient to add some methods for manipulating elements in our linked list, such as being able to add an entry to the head of the list or to the tail of the list. Let’s add those:
 
 ```rust
-	/// Returns a reference to the element stored at 
-	/// the head of the list 
-	pub fn front(&self) -> Option&T> {
-		// fetch the head entry and return a 
-		// reference to the inner value 
-		self.entries.get(self.head).map(|e| &e.val)
-	}
+    /// Returns a reference to the element stored at 
+    /// the head of the list 
+    pub fn front(&self) -> Option&T> {
+        // fetch the head entry and return a 
+        // reference to the inner value 
+        self.entries.get(self.head).map(|e| &e.val)
+    }
 
-	/// Returns a mutable reference to the element stored 
-	// at the head of the list 
-	pub fn front_mut(&mut self) -> Option<&mut T> {
-		// fetch the head entry mutably and return a 
-		// mutable reference to the inner value
-		self.entries.get_mut(self.head).map(|e| &mut e.val)
-	}
+    /// Returns a mutable reference to the element stored 
+    // at the head of the list 
+    pub fn front_mut(&mut self) -> Option<&mut T> {
+        // fetch the head entry mutably and return a 
+        // mutable reference to the inner value
+        self.entries.get_mut(self.head).map(|e| &mut e.val)
+    }
 
-	/// Takes an entry that has been added to the linked 
-	/// list and moves the head to the entry’s position 
-	fn push_front(&mut self, index: usize) {
-		if self.entries.len() == 1 {
-			self.tail = index;
-		} else {
-			self.entries[index].next = self.head;
-			self.entries[self.head].prev = index;
-		}
+    /// Takes an entry that has been added to the linked 
+    /// list and moves the head to the entry’s position 
+    fn push_front(&mut self, index: usize) {
+        if self.entries.len() == 1 {
+            self.tail = index;
+        } else {
+            self.entries[index].next = self.head;
+            self.entries[self.head].prev = index;
+        }
 
-		self.head = index;
-	}
+        self.head = index;
+    }
 
-	/// Remove the last entry from the list and returns
-	/// the index of the removed entry. Note that this 
-	/// only unlinks the entry from the list, it doesn’t
-	/// remove it from the array.
-	fn pop_back(&mut self) -> usize {
-		let old_tail = self.tail;
-		let new_tail = self.entries[old_tail].prev;
-		self.tail = new_tail;
-		old_tail
-	}
+    /// Remove the last entry from the list and returns
+    /// the index of the removed entry. Note that this 
+    /// only unlinks the entry from the list, it doesn’t
+    /// remove it from the array.
+    fn pop_back(&mut self) -> usize {
+        let old_tail = self.tail;
+        let new_tail = self.entries[old_tail].prev;
+        self.tail = new_tail;
+        old_tail
+    }
 ```
 
 We’ll add one more method, `remove`, that takes as input an index into our array-backed linked list and “removes” the entry at that index. Note that this method actually only unlinks the entry from the linked list without actually removing it from the array. This is to avoid the runtime overhead of having to shift subsequent array elements forward to fill in the empty slot.
 
 ```rust
-	fn remove(&mut self, index: usize) {
-		assert!(self.length > 0);
+    fn remove(&mut self, index: usize) {
+        assert!(self.length > 0);
 
-		let prev = self.entries[index].prev;
-		let next = self.entries[index].next;
+        let prev = self.entries[index].prev;
+        let next = self.entries[index].next;
 
-		if index == self.head {
-			self.head = next;
-		} else {
-			self.entries[prev].next = next;
-		}
+        if index == self.head {
+            self.head = next;
+        } else {
+            self.entries[prev].next = next;
+        }
 
-		if index == self.tail {
-			self.tail = prev;
-		} else {
-			self.entries[next].prev = prev;
-		}
+        if index == self.tail {
+            self.tail = prev;
+        } else {
+            self.entries[next].prev = prev;
+        }
 
-		self.length -= 1;
-	}
+        self.length -= 1;
+    }
 ```
 
 ### Touching our Entries 
@@ -505,18 +505,18 @@ In our Python implementation, we could conveniently access any entry in the cach
 Let’s first define a helper method called `touch_index` that will receive an index to an entry in our cache and move it to the head of the linked list:
 
 ```rust
-	/// Touch a given entry at the given index, putting it 
-	/// first in the list.
-	fn touch_index(&mut self, index: usize) {
-		if index != self.head {
-			self.remove(index);
+    /// Touch a given entry at the given index, putting it 
+    /// first in the list.
+    fn touch_index(&mut self, index: usize) {
+        if index != self.head {
+            self.remove(index);
 
-			// need to increment `self.length` here since 
-			// `remove` decrements it 
-			self.length += 1;
-			self.push_front(index);
-		}
-	}
+            // need to increment `self.length` here since 
+            // `remove` decrements it 
+            self.length += 1;
+            self.push_front(index);
+        }
+    }
 ```
 
 With that, we can now implement `touch`. We’ll specify that the predicate must implement the `FnMut` trait, which, according to the [docs][fnmut-docs], fits our use-case nicely:
@@ -528,52 +528,52 @@ We’re more concerned with being able to “call it [the predicate] repeatedly�
 Our `touch` method iterates over the entries in our cache (using our `iter_mut` method) and finds the first entry whose value matches the predicate. We then pass the index associated with the found entry to our `touch_index` method, which handles moving the entry to the head of the list:
 
 ```rust
-	/// Touches the first entry in the cache that matches the
-	/// given predicate. Returns `true` on a hit and `false`
-	/// if no match is found.
-	pub fn touch<F>(&mut self, mut pred: F) -> bool
-	where
-		F: FnMut(&T) -> bool,
-	{
-		match self.iter_mut().find(|&(_, ref x)| pred(x)) {
-			Some((i, _)) => {
-				self.touch_index(i);
-				true
-			},
-			None => false,
-		}
-	}
+    /// Touches the first entry in the cache that matches the
+    /// given predicate. Returns `true` on a hit and `false`
+    /// if no match is found.
+    pub fn touch<F>(&mut self, mut pred: F) -> bool
+    where
+        F: FnMut(&T) -> bool,
+    {
+        match self.iter_mut().find(|&(_, ref x)| pred(x)) {
+            Some((i, _)) => {
+                self.touch_index(i);
+                true
+            },
+            None => false,
+        }
+    }
 ```
 
 We can implement a similar method, `lookup`, which will essentially do the same thing as what our `touch` method is doing, but instead of returning a boolean indicating whether an entry matching the input predicate was found or not, `lookup` instead returns the found entry’s value or `None`.
 
 ```rust
-	pub fn lookup<F, R>(&mut self, mut pred: F) -> Option<R>
-	where
-		F: FnMut(&mut T) -> Option<R>,
-	{
-		let mut result = None;
+    pub fn lookup<F, R>(&mut self, mut pred: F) -> Option<R>
+    where
+        F: FnMut(&mut T) -> Option<R>,
+    {
+        let mut result = None;
 
-		// iterate through our entries, testing each 
-		// using the predicate
-		for (i, entry) in self.iter_mut() {
-			if let Some(r) = pred(entry) {
-				result = Some((i, r));
-				break;
-			}
-		}
+        // iterate through our entries, testing each 
+        // using the predicate
+        for (i, entry) in self.iter_mut() {
+            if let Some(r) = pred(entry) {
+                result = Some((i, r));
+                break;
+            }
+        }
 
-		// once we’ve iterated through all entries, match 
-		// on the result to move it to the head of the list
-		// if necessary
-		match result {
-			None => None,
-			Some((i, r)) => {
-				self.touch_index(i);
-				Some(r)
-			}
-		}
-	}
+        // once we’ve iterated through all entries, match 
+        // on the result to move it to the head of the list
+        // if necessary
+        match result {
+            None => None,
+            Some((i, r)) => {
+                self.touch_index(i);
+                Some(r)
+            }
+        }
+    }
 ```
 
 ### Inserting New Entries 
@@ -581,29 +581,29 @@ We can implement a similar method, `lookup`, which will essentially do the same 
 We can now fetch existing entries from our cache, and those entries will be moved to the head of the list when they are fetched. Let’s add an `insert` method that will take some `val` of arbitrary type and add it to the head of the linked list:
 
 ```rust
-	fn insert(&mut self, val: T) {
-		let entry = Entry {
-			val,
-			prev: 0,
-			next: 0,
-		};
+    fn insert(&mut self, val: T) {
+        let entry = Entry {
+            val,
+            prev: 0,
+            next: 0,
+        };
 
-		// check if the cache is at full capacity 
-		let new_head = if self.length == self.entries.capacity() {
-			// get the index of the oldest entry
-			let last_index = self.pop_back();
-			// overwrite the oldest entry with the new entry
-			self.entries[last_index] = entry;
-			// return the index of the newly-overwritten entry
-			last_index
-		} else {
-			self.entries.push(entry);
-			self.length += 1;
-			self.entries.len() - 1
-		};
+        // check if the cache is at full capacity 
+        let new_head = if self.length == self.entries.capacity() {
+            // get the index of the oldest entry
+            let last_index = self.pop_back();
+            // overwrite the oldest entry with the new entry
+            self.entries[last_index] = entry;
+            // return the index of the newly-overwritten entry
+            last_index
+        } else {
+            self.entries.push(entry);
+            self.length += 1;
+            self.entries.len() - 1
+        };
 
-		self.push_front(new_head);
-	}
+        self.push_front(new_head);
+    }
 ```
 
 With that, our cache is feature-complete! You can find the full code [here][rust-impl], complete with tests as well as some additional miscellaneous trait implementations. 
