@@ -21,7 +21,7 @@ Afterwards, I browsed some others’ implementations and came across this one:
 
 ```haskell
 isPangram text = all (`elem` lowercased) [‘a’..’z’]
-	where lowercased = map toLower text
+    where lowercased = map toLower text
 ```
 
 ## The Turn
@@ -52,7 +52,7 @@ Using the same pieces present in the Haskell implementation, we can implement a 
 
 ```rust
 fn is_pangram(text: &str) -> bool {
-	// maps to `[‘a’..’z’]`
+    maps to `[‘a’..’z’]`
     let alphabet = “abcdefghijklmnopqrstuvwxyz”;
     
     // maps to `where lowercased = map toLower text`
