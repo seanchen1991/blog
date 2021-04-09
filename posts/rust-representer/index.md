@@ -62,29 +62,29 @@ use std::io::Read;
 use std::process;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-	let output_path = “./output.rs”;
-	let mut args = end::args();
-	let _ = args.next();
-	
-	let filename = match (args.next(), args.next()) {
-		(Some(filename), None) => filename,
-		_ => {
-			eprintln!(“Usage: representer path/to/filename.rs”);
-			process::exit(1);
-		}
-	};
-	
-	let mut input = File::open(&filename)?;
-	let mut src = String::new();
-	input.read_to_string(&mut src)?;
-	
-	let syntax = syn::parse_file(&src)?;
-	println!(“{:?}”, syntax);
-	
-	let mut output = File::create(output_path)?;
-	output.write(syntax.to_string().as_bytes())?;
-	
-	Ok(())
+    let output_path = “./output.rs”;
+    let mut args = end::args();
+    let _ = args.next();
+
+    let filename = match (args.next(), args.next()) {
+        (Some(filename), None) => filename,
+        _ => {
+            eprintln!(“Usage: representer path/to/filename.rs”);
+            process::exit(1);
+        }
+    };
+
+    let mut input = File::open(&filename)?;
+    let mut src = String::new();
+    input.read_to_string(&mut src)?;
+
+    let syntax = syn::parse_file(&src)?;
+    println!(“{:?}”, syntax);
+
+    let mut output = File::create(output_path)?;
+    output.write(syntax.to_string().as_bytes())?;
+
+    Ok(())
 }
 ```
 
@@ -119,10 +119,10 @@ use syn::visit_mut::VisitMut;
 struct IdentVisitor;
 
 impl VisitMut for IdentVisitor {
-	fn visit_pat_ident_mut(&mut self, node: &mut PatIdent) {
-		// replace the node’s ident field with “PLACEHOLDER”
-		self.ident = Ident::new(“PLACEHOLDER”, Span::call_site());
-	}
+    fn visit_pat_ident_mut(&mut self, node: &mut PatIdent) {
+        // replace the node’s ident field with “PLACEHOLDER”
+        self.ident = Ident::new(“PLACEHOLDER”, Span::call_site());
+    }
 }
 ```
 
@@ -144,37 +144,37 @@ use std::collections::hash_map::Entry;
 const PLACEHOLDER: &str = “PLACEHOLDER_”;
 
 struct IdentVisitor {
-	mappings: HashMap<String, u32>,
-	// a monotonically-increasing counter for new placeholders
-	uid: u32,
+    mappings: HashMap<String, u32>,
+    // a monotonically-increasing counter for new placeholders
+    uid: u32,
 }
 
 impl IdentVisitor {
-	fn new() -> Self {
-		IdentVisitor {
-			mappings: HashMap::new(),
-			uid: 0,
-		}
-	}
+    fn new() -> Self {
+        IdentVisitor {
+            mappings: HashMap::new(),
+            uid: 0,
+        }
+    }
 ```
 
 We’ll then also add a method to either fetch a pre-existing placeholder, or generate a new one if the identifier doesn’t yet exist as a mapping:
 
 ```rust
 impl IdentVisitor {
-	...
-	
-	fn get_or_insert_mapping(&mut self, ident: String) -> String {
-		let uid = match self.mappings.entry(ident) {
-			Entry::Occupied(o) => o.into_mut(),
-			Entry::Vacant(v) => {
-				self.uid += 1;
-				v.insert(self.uid);
-			}
-		};
-		
-		format!(“{}{}”, PLACEHOLDER, uid)
-	}
+    ...
+
+    fn get_or_insert_mapping(&mut self, ident: String) -> String {
+        let uid = match self.mappings.entry(ident) {
+            Entry::Occupied(o) => o.into_mut(),
+            Entry::Vacant(v) => {
+                self.uid += 1;
+                v.insert(self.uid);
+            }
+        };
+
+        format!(“{}{}”, PLACEHOLDER, uid)
+    }
 }
 ```
 
@@ -182,10 +182,10 @@ We can now refactor our `visit_pat_ident_mut` method to use `get_or_insert_mappi
 
 ```rust
 impl VisitMut for IdentVisitor {
-	fn visit_pat_ident_mut(&mut self, node: &mut PatIdent) {
-		let placeholder = self.get_or_insert_mapping(node.ident.to_string());
-		self.ident = Ident::new(placeholder, Span::call_site());
-	}
+    fn visit_pat_ident_mut(&mut self, node: &mut PatIdent) {
+        let placeholder = self.get_or_insert_mapping(node.ident.to_string());
+        self.ident = Ident::new(placeholder, Span::call_site());
+    }
 }
 ```
 
@@ -204,12 +204,12 @@ Struct names can be accessed via the `visit_item_struct_mut` method. Recycling t
 
 ```rust
 impl VisitMut for IdentVisitor {
-	...
-	
-	fn visit_item_struct_mut(&mut self, node: &mut ItemStruct) {
-		let placeholder = self.get_or_insert_mapping(node.ident.to_strong());
-		self.ident = Ident::new(placeholder, Span::call_site());	
-	}
+    ...
+
+    fn visit_item_struct_mut(&mut self, node: &mut ItemStruct) {
+        let placeholder = self.get_or_insert_mapping(node.ident.to_strong());
+        self.ident = Ident::new(placeholder, Span::call_site());	
+    }
 }
 ```
 
@@ -221,8 +221,8 @@ The trait I ended up implementing exposes two methods: `ident_string`, which ens
 
 ```rust
 trait ReplaceIdentifier {
-	fn ident_string(&self) -> String;
-	fn set_ident(&mut self, ident: String);
+    fn ident_string(&self) -> String;
+    fn set_ident(&mut self, ident: String);
 }
 ```
 
@@ -230,23 +230,23 @@ Now, we’ll implement this trait on nodes that have an identifier, which includ
 
 ```rust
 impl ReplaceIdentifier for PatIdent {
-	fn ident_string(&self) -> String {
-		self.ident.to_string()
-	}
-	
-	fn set_ident(&mut self, ident: String) {
-		self.ident = Ident::new(ident, Span::call_site());
-	}
+    fn ident_string(&self) -> String {
+        self.ident.to_string()
+    }
+
+    fn set_ident(&mut self, ident: String) {
+        self.ident = Ident::new(ident, Span::call_site());
+    }
 }
 
 impl ReplaceIdentifier for ItemStruct {
-	fn ident_string(&self) -> String {
-		self.ident.to_string()
-	}
-	
-	fn set_ident(&mut self, ident: String) {
-		self.ident = Ident::new(ident, Span::call_site());
-	}
+    fn ident_string(&self) -> String {
+        self.ident.to_string()
+    }
+
+    fn set_ident(&mut self, ident: String) {
+        self.ident = Ident::new(ident, Span::call_site());
+    }
 }
 ```
 
@@ -254,13 +254,13 @@ I then opted to implement a `replace_identifier` method for any type that implem
 
 ```rust
 impl IdentVisitor {
-	...
-	
-	fn replace_identifier<Node: ReplaceIdentifier>(&mut self, node: Node) {
-		let ident_string = node.ident_string();
-		let identifier = self.get_or_insert_mapping(ident_string);
-		node.set_ident(identifier);
-	}
+    ...
+
+    fn replace_identifier<Node: ReplaceIdentifier>(&mut self, node: Node) {
+        let ident_string = node.ident_string();
+        let identifier = self.get_or_insert_mapping(ident_string);
+        node.set_ident(identifier);
+    }
 }
 ```
 
@@ -268,15 +268,15 @@ Following this, we’ll change our various `visit_mut` methods to utilize `repla
 
 ```rust
 impl IdentVisitor {
-  ...
-  
-  fn visit_pat_ident_mut(&mut self, node: &mut PatIdent) {
-	  self.replace_identifier(node);
-  }
-  
-  fn visit_item_struct_mut(&mut self, node: &mut ItemStruct) {
-	  self.replace_identifier(node);
-  }
+    ...
+
+    fn visit_pat_ident_mut(&mut self, node: &mut PatIdent) {
+        self.replace_identifier(node);
+    }
+
+    fn visit_item_struct_mut(&mut self, node: &mut ItemStruct) {
+        self.replace_identifier(node);
+    }
 }
 ```
 
