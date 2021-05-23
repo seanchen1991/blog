@@ -305,8 +305,17 @@ While the portrait of the representer that I’ve painted in this post is quite 
 After hitting the initial MVP, I've since stepped away working on the Rust representer and handed off maintenance to the other Exercism Rust maintainers. One feature extension I've thought of has to do with all of the redundant boilerplate that exists to implement the ReplaceIdentifier trait for different AST nodes; if you take a look at it [here](https://github.com/exercism/rust-representer/blob/main/src/replace_identifier.rs), you'll notice almost all of the trait implementations are identical. A procedural macro could be defined to generate this boilerplate, such that we'd simply be able to annotate the different AST node types, which would be pretty slick:
 
 ```rust
-#[derive(ReplaceIdentifier)]
-use syn::PatIdent;
+use syn::{
+    #[derive(ReplaceIdentifier)]
+    ItemEnum,
+    #[derive(ReplaceIdentifier)]
+    ItemStruct,
+    #[derive(ReplaceIdentifier)]
+    ItemTrait,
+    #[derive(ReplaceIdentifier)]
+    PatIdent, 
+    ...
+};
 ```
 
 If you’re interested in contributing to this sort of project, or helping out as a mentor for those looking to sharpen their programming skills, [Exercism](https://exercism.io) is always looking for more open source contributors, maintainers, and mentors, especially with our in-progress [V3](https://github.com/exercism/v3) push!
