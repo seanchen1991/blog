@@ -40,7 +40,21 @@ fn PLACEHOLDER_1(PLACEHOLDER_2: &str) -> String {
 }
 ```
 
-This is the job of a program called a representer. In Exercism, each language track will have its own representer to handle submissions for that particular track. When I noticed that the Rust track didn’t yet have a representer that was being worked on, I jumped at the chance to work on it!
+The idea is that the normalized representation would make it easier for mentors to focus on the overall structure and shape of the solution, so that they'd be able to give higher-level feedback.
+
+For example, with the following normalized representation of an alternative solution to this exercise, a mentor would be able to focus more quickly on the fact that the student used an if-else with explicit `return`s, neither of which are idiomatic in Rust, and would be able to provide feedback to that effect.
+
+```rust
+fn PLACEHOLDER_1(PLACEHOLDER_2: &str) -> String {
+    if PLACEHOLDER_2 == "" {
+        return "One for you, one for me.".to_string();
+    } else {
+        return format!("One for {}, one for me.", PLACEHOLDER_2);
+    }
+}
+```
+
+The program that performs this normalization is called a representer. In Exercism, each language track will have its own representer to handle submissions for that particular track. When I noticed that the Rust track didn’t yet have a representer that was being worked on, I jumped at the chance to work on it!
 
 ## Implementing a Rust Representer
 
