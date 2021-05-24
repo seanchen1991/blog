@@ -298,24 +298,70 @@ Refactoring the code in this way clearly separates concerns: the `visit_mut` met
 
 It was so cool to me to have gotten an opportunity to utilize traits in such a way when implementing this project. Before this, I’d only ever had a vague understanding of traits. Using them in this way in this project really served to hammer home the point of why traits are useful and when are appropriate times to use them.
 
-## In Closing
+While the portrait of the representer that I’ve painted in this post is quite simplified (some types of Rust syntax, such as expressions, are a bit more complex to handle), it preserves the kernel of how the representer functions. 
 
-While the portrait of the representer that I’ve painted in this post is quite simplified (some types of Rust syntax, such as expressions, are a bit more complex to handle), it preserves the kernel of how the representer functions. If you’re interested, you can keep track of my progress [here](https://github.com/exercism/rust-representer).
+## Generaing Boilerplate with a Procedural Macro
 
-After hitting the initial MVP, I've since stepped away working on the Rust representer and handed off maintenance to the other Exercism Rust maintainers. One feature extension I've thought of has to do with all of the redundant boilerplate that exists to implement the ReplaceIdentifier trait for different AST nodes; if you take a look at it [here](https://github.com/exercism/rust-representer/blob/main/src/replace_identifier.rs), you'll notice almost all of the trait implementations are identical. A procedural macro could be defined to generate this boilerplate, such that we'd simply be able to annotate the different AST node types, which would be pretty slick:
+After hitting the initial MVP, I've since stepped away working on the Rust representer and handed off maintenance to the other Exercism Rust maintainers. One feature extension I've thought of has to do with all of the redundant boilerplate that exists to implement the ReplaceIdentifier trait for different AST nodes; if you take a look at it [here](https://github.com/exercism/rust-representer/blob/main/src/replace_identifier.rs), you'll notice almost all of the trait implementations are identical. A procedural macro could be defined to generate this boilerplate, such that we'd simply be able to annotate the different AST node types, which would be pretty slick. 
+
+The way this would probably work is we'd define an enum whose variants are all of the `syn` identifier types that we want to implement the `ReplaceIdentifier` trait for, then simply annotate our enum with a `#[derive(ReplaceIdentifier)]` statement:
 
 ```rust
 use syn::{
-    #[derive(ReplaceIdentifier)]
-    ItemEnum,
-    #[derive(ReplaceIdentifier)]
-    ItemStruct,
-    #[derive(ReplaceIdentifier)]
-    ItemTrait,
-    #[derive(ReplaceIdentifier)]
-    PatIdent, 
-    ...
+    ItemEnum, ItemStruct, ItemTrait, PatIdent, ...
 };
+
+#[derive(ReplaceIdentifier)]
+enum ToReplace {
+    ItemEnum,
+    ItemStruct,
+    ItemTrait,
+    PatIdent,
+    ...
+}
 ```
+
+Here's what an implementation of this procedural macro could look like:
+```rust
+#[proc_macro_derive(ReplaceIdentifier)]
+pub fn derive(input: TokenStream) -> TokenStream {
+    let ast = parse_macro_input!(input as DeriveInput); 
+
+    let mut impls = vec![];
+
+    match ast.data {
+        Data::Enum(DataEnum { variants, .. }) => {
+            for variant in variants {
+                match variant.fields {
+                    Fields::Unit => {
+                        let vident = variant.ident;
+                        impls.push(quote! {
+                            impl ReplaceIdentifier for #vident {
+                                fn ident_string(&self) -> String {
+                                    self.ident.to_string()
+                                }
+
+                                fn set_ident(&mut self, ident: String) {
+                                    self.ident = syn::Ident::new(&ident, syn::Span::call_site());
+                                }
+                            }
+                        });
+                    }
+                    _ => {}
+                }
+            }
+        }
+        _ => {}
+    }
+    
+    let expanded = quote! { #(#impls)* };
+
+    expanded.into()
+}
+```
+
+And lo and behold, it would generate an `impl ReplaceIdentifier` block for each of the variants in the enum, complete with all of the necessary trait methods! 
+
+## In Closing
 
 If you’re interested in contributing to this sort of project, or helping out as a mentor for those looking to sharpen their programming skills, [Exercism](https://exercism.io) is always looking for more open source contributors, maintainers, and mentors, especially with our in-progress [V3](https://github.com/exercism/v3) push!
