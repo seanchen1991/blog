@@ -365,3 +365,29 @@ And lo and behold, it would generate an `impl ReplaceIdentifier` block for each 
 ## In Closing
 
 If you’re interested in contributing to this sort of project, or helping out as a mentor for those looking to sharpen their programming skills, [Exercism](https://exercism.io) is always looking for more open source contributors, maintainers, and mentors, especially with our in-progress [V3](https://github.com/exercism/v3) push!
+
+```rust
+#[test]
+fn test_struct_fields() -> Result<(), Box<dyn Error>> {
+    let input = include_str!("test_input/struct_fields.rs");
+    let expected = include_str!("expected_output/struct_fields.rs");
+
+    let mut input: syn::File = syn::parse_str(input)?;
+    let replaced = replace(&mut input);
+    assert_eq!(replaced.to_string(), expected);
+
+    Ok(())
+}
+
+#[test]
+fn test_enum_names() -> Result<(), Box<dyn Error>> {
+    let input = include_str!("test_input/enum_names.rs");
+    let expected = include_str!("expected_output/enum_names.rs");
+
+    let mut input: syn::File = syn::parse_str(input)?;
+    let replaced = replace(&mut input);
+    assert_eq!(replaced.to_string(), expected);
+
+    Ok(())
+}
+```
