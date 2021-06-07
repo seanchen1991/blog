@@ -391,3 +391,12 @@ fn test_enum_names() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 ```
+```rust
+pub struct Foo {
+    x: A,
+    y: B,
+}
+```
+```rust
+pub struct PLACEHOLDER_1 { PLACEHOLDER_2 : A, PLACEHOLDER_3 : B, }
+```
