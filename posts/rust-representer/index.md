@@ -380,9 +380,9 @@ fn test_struct_fields() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
-fn test_enum_names() -> Result<(), Box<dyn Error>> {
-    let input = include_str!("test_input/enum_names.rs");
-    let expected = include_str!("expected_output/enum_names.rs");
+fn test_enum_variants() -> Result<(), Box<dyn Error>> {
+    let input = include_str!("test_input/enum_variants.rs");
+    let expected = include_str!("expected_output/enum_variants.rs");
 
     let mut input: syn::File = syn::parse_str(input)?;
     let replaced = replace(&mut input);
@@ -399,4 +399,19 @@ pub struct Foo {
 ```
 ```rust
 pub struct PLACEHOLDER_1 { PLACEHOLDER_2 : A, PLACEHOLDER_3 : B, }
+```
+```rust
+pub enum MyEnum {
+    Foo,
+    Bar,
+}
+
+enum Variants {
+    First = 1,
+    Second = 2,
+}
+```
+```rust
+pub enum PLACEHOLDER_1 { PLACEHOLDER_2 , PLACEHOLDER_3 , } 
+enum PLACEHOLDER_4 { PLACEHOLDER_5 = 1 , PLACEHOLDER_6 = 2 , }
 ```
